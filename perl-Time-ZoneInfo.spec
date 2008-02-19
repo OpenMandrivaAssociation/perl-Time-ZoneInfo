@@ -25,7 +25,7 @@ Version 0.3.1 also gives the geolocalisation for a time zone.
 
 %prep
 %setup -q -n %{realname}-%{realversion}
-%patch0 -p1 -b .pix
+%patch0 -p1 -b .geo
 
 %build
 %{__perl} Makefile.PL INSTALLDIRS=vendor
