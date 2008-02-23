@@ -1,6 +1,6 @@
 %define realname    Time-ZoneInfo
 %define realversion 0.3
-%define version	    0.3.3
+%define version	    0.3.4
 %define release     %mkrel 1
 
 Name:       perl-%{realname}
