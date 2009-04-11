@@ -10,7 +10,7 @@ License:    GPL or Artistic
 Group:      Development/Perl
 Summary:    Perl extension for returning a list of Time Zones
 Source:     http://www.cpan.org/modules/by-module/Time/%{realname}-%{realversion}.tar.gz
-Patch:	    Time-ZoneInfo-0.3-geolocalisation.patch
+Patch0:	    Time-ZoneInfo-0.3-geolocalisation.patch
 Url:        http://search.cpan.org/dist/%{realname}
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires: perl-devel
