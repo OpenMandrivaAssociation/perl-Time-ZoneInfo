@@ -1,19 +1,18 @@
-%define realname    Time-ZoneInfo
-%define realversion 0.3
-%define version	    0.3.4
-%define release     %mkrel 2
+%define upstream_name    Time-ZoneInfo
+%define upstream_version 0.3
 
-Name:       perl-%{realname}
-Version:    %{version}
-Release:    %{release}
-License:    GPL or Artistic
-Group:      Development/Perl
+Name:       perl-%{upstream_name}
+Version:    %perl_convert_version %{upstream_version}
+Release:    %mkrel 1
+
 Summary:    Perl extension for returning a list of Time Zones
-Source:     http://www.cpan.org/modules/by-module/Time/%{realname}-%{realversion}.tar.gz
+License:    GPL+ or Artistic
+Group:      Development/Perl
+Url:        http://search.cpan.org/dist/%{upstream_name}
+Source0:    http://www.cpan.org/modules/by-module/Time/%{upstream_name}-%{upstream_version}.tar.gz
 Patch0:	    Time-ZoneInfo-0.3-geolocalisation.patch
-Url:        http://search.cpan.org/dist/%{realname}
-BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-BuildRequires: perl-devel
+
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}
 BuildArch: noarch
 
 %description
@@ -24,7 +23,7 @@ time zones.
 Version 0.3.1 also gives the geolocalisation for a time zone.
 
 %prep
-%setup -q -n %{realname}-%{realversion}
+%setup -q -n %{upstream_name}-%{upstream_version}
 %patch0 -p1 -b .geo
 
 %build
