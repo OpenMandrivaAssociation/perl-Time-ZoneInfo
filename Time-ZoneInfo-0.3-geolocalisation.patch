@@ -1,0 +1,177 @@
+diff -p -up Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm.geo Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm
+--- Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm.geo	2004-03-22 13:48:22.000000000 +0100
++++ Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm	2008-02-19 18:16:47.000000000 +0100
+@@ -17,7 +17,7 @@ sub init {
+ 	my ($this, %params) = @_;
+ 	# Read in and process the /usr/share/zoneinfo/zone.tab file
+ 	# Create a REGIONS array (only region part) and ZONES (full part)
+-	my (@zones, %regions, $zone);
++	my (@zones, %regions, %localisation, %countries, $zone);
+ 	
+ 	my $filename = $params{zonetab} || "/usr/share/zoneinfo/zone.tab";
+ 	my $fh = new IO::File;
+@@ -32,8 +32,10 @@ sub init {
+ 		next if ($line =~ /^\s*#/);
+ 		next if ($line =~ /^\s*$/);
+ 		$line =~ s/#.*$//;
+-		if ($line =~ /^[^#](\S+)\s*\t\s*(\S+)\s*\t\s*(\S+)\s*(\t|$)/) {
++		if ($line =~ /^([^#]\S+)\s*\t\s*(\S+)\s*\t\s*(\S+)\s*(\t|$)/) {
+ 			$zone = $3;
++			$countries{$zone} = $1;
++			$localisation{$zone} = $2;
+ 			if ($zone =~ m|^(.+?)/(.+)$|) {
+ 				$regions{$1}++;
+ 			}
+@@ -42,6 +44,8 @@ sub init {
+ 	}
+ 	$this->{REGIONS} = [keys %regions];
+ 	$this->{ZONES} = \@zones;
++	$this->{COUNTRIES} = \%countries;
++	$this->{LOCALISATION} = \%localisation;
+ 	return 1;
+ }
+ 
+@@ -68,6 +72,65 @@ sub _zones {
+ 	return wantarray ? @{$this->{ZONES}} : $this->{ZONES};
+ }
+ 
++sub country {
++	my ($this, $zone) = @_;
++	$this->{COUNTRIES}{$zone};
++}
++
++sub current_zone {
++	my ($this) = @_;
++	if (-e '/etc/timezone') {
++		open(my $F, '<', '/etc/timezone');
++		my ($zone) = <$F> =~ /(\S+)/ or return;
++		$zone;
++	} elsif (-e '/etc/sysconfig/clock') {
++		open(my $F, '<', '/etc/sysconfig/clock');
++		my ($zone) = join('', <$F>) =~ /^ZONE=(.*)/m or return;
++		$zone =~ s/^"(.*)"$/$1/ || $zone =~ s/^'(.*)'$/$1/;
++		$zone;
++	} else {
++		undef;
++	}
++}
++
++sub _raw_latitude_longitude {
++	my ($this, $zone) = @_;
++	my $loc = $this->{LOCALISATION}{$zone} or return;
++	$loc =~ /^([+-]\d\d)(\d\d)(\d\d)?([+-]\d\d\d)(\d\d)(\d\d)?/ or return;
++
++	[ $1, $2, $3 || '00' ], [ $4, $5, $6 || '00' ];
++}
++
++sub _deg_min_sec_to_decimal {
++	my ($coord) = @_;
++	my ($deg, $min, $sec) = @$coord;
++	$deg + $min / 60 + $sec / 3600;
++}
++
++sub _deg_min_sec_to_sexagesimal {
++	my ($coord, $pos, $neg) = @_;
++	my ($deg, $min, $sec) = @$coord;
++	sprintf("%02d_%02d'", abs($deg), $min) . ($sec != 0 ? qq($sec") : '') . ($deg >= 0 ? $pos : $neg);
++}
++
++sub latitude_longitude_decimal {
++	my ($this, $zone) = @_;
++	map { _deg_min_sec_to_decimal($_) } $this->_raw_latitude_longitude($zone);
++}
++
++sub latitude_longitude_sexagesimal {
++	my ($this, $zone) = @_;
++	my ($lat, $lon) = $this->_raw_latitude_longitude($zone) or return;
++	_deg_min_sec_to_sexagesimal($lat, 'N', 'S'), 
++	  _deg_min_sec_to_sexagesimal($lon, 'E', 'W'); 
++}
++
++sub latitude_decimal  { (latitude_longitude_decimal(@_))[0] }
++sub longitude_decimal { (latitude_longitude_decimal(@_))[1] }
++
++sub latitude_sexagesimal  { (latitude_longitude_sexagesimal(@_))[0] }
++sub longitude_sexagesimal { (latitude_longitude_sexagesimal(@_))[1] }
++
+ 1;
+ 
+ __END__
+@@ -85,18 +148,18 @@ Time::ZoneInfo - Perl extension for retu
+ 		print $zone . "\n";
+ 	}
+ 
++	if (my $zone = Time::ZoneInfo->current_zone) {
++		my ($latitude, $longitude) = $zones->latitude_longitude_sexagesimal($zone);
++		print "$zone: ", $zones->country($zone), "  $latitude $longitude\n";
++	}
++
+ =head1 DESCRIPTION
+ 
+ An OO interface to accessing a list of timezones. This is useful if you
+ want to provide an interface for your user to choose one of the available
+ time zones.
+ 
+-This will be the final release of Time::ZoneInfo as we hope it will be replaced
+-by code in the perl date time project - see L<http://datetime.perl.org/>.
+-
+-Currently it is fairly hard coded to work on Debian Linux, but I will 
+-take any suggesitons on other locaitons so it can automatically fall
+-back to other file locations, and provide your own as an alternative.
++Version 0.3.1 also gives the geolocalisation for a time zone.
+ 
+ =head1 METHODS
+ 
+@@ -112,6 +175,43 @@ Return an array (or array ref) to the li
+ 
+ Return zones (optionally just for one region)
+ 
++=head2 country (zone)
++
++Return the country associated with the given zone
++
++=head2 current_zone
++
++Return the current zone configured
++
++=head2 latitude_decimal(zone)
++
++Return the latitude for the given zone using decimal notation.
++
++=head2 latitude_sexagesimal(zone)
++
++Return the latitude for the given zone using sexagesimal notation 
++(eg: 51_30'30"N)
++
++=head2 longitude_decimal(zone)
++
++Return the longitude for the given zone using decimal notation.
++
++=head2 longitude_sexagesimal(zone)
++
++Return the longitude for the given zone using sexagesimal notation 
++(eg: 00_07'31"E)
++
++=head2 latitude_longitude_decimal(zone)
++
++Return a list of two elements: the latitude and longitude for the given zone using decimal notation.
++
++=head2 latitude_longitude_sexagesimal(zone)
++
++Return a list of two elements: the latitude and longitude for the given zone using sexagesimal notation
++(eg: 51_30'30"N and 00_07'31"E)
++
++=
++
+ =head1 ERRORS
+ 
+ You can read $Time::ZoneInfo::ERROR for an error message at any time.
+@@ -121,6 +221,8 @@ You can read $Time::ZoneInfo::ERROR for 
+ Thanks to Richard Carver <cpan.org-rnc@thecarverzone.com> for finding
+ issues processing comments.
+ 
++Pascal "Pixel" Rigaux added geolocalisation
++
+ =head1 AUTHOR
+ 
+ Scot Penrose, E<lt>scott@cpan.orgE<gt>
