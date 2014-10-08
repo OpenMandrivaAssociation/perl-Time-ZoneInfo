@@ -12,6 +12,7 @@ Source0:	http://www.cpan.org/modules/by-module/Time/%{modname}-%{modver}.tar.gz
 Patch0:		Time-ZoneInfo-0.3-geolocalisation.patch
 BuildArch:	noarch
 BuildRequires:	perl-devel
+BuildRequires:	perl(DateTime::TimeZone)
 
 %description
 An OO interface to accessing a list of timezones. This is useful if you
