@@ -1,7 +1,15 @@
-diff -p -up Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm.geo Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm
---- Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm.geo	2004-03-22 13:48:22.000000000 +0100
-+++ Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm	2008-02-19 18:16:47.000000000 +0100
-@@ -17,7 +17,7 @@ sub init {
+diff -Naur Time-ZoneInfo-0.3.orig/lib/Time/ZoneInfo.pm Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm
+--- Time-ZoneInfo-0.3.orig/lib/Time/ZoneInfo.pm	2014-10-08 04:16:42.386383486 -0400
++++ Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm	2014-10-08 04:19:34.773375648 -0400
+@@ -3,6 +3,7 @@
+ use vars qw/$VERSION/;
+ $VERSION = '0.3';
+ use IO::File;
++use DateTime::TimeZone;
+ 
+ $Time::ZoneInfo::ERROR = "";
+ 
+@@ -17,7 +18,7 @@
  	my ($this, %params) = @_;
  	# Read in and process the /usr/share/zoneinfo/zone.tab file
  	# Create a REGIONS array (only region part) and ZONES (full part)
@@ -10,7 +18,7 @@ diff -p -up Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm.geo Time-ZoneInfo-0.3/lib/Tim
  	
  	my $filename = $params{zonetab} || "/usr/share/zoneinfo/zone.tab";
  	my $fh = new IO::File;
-@@ -32,8 +32,10 @@ sub init {
+@@ -32,8 +33,10 @@
  		next if ($line =~ /^\s*#/);
  		next if ($line =~ /^\s*$/);
  		$line =~ s/#.*$//;
@@ -22,7 +30,7 @@ diff -p -up Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm.geo Time-ZoneInfo-0.3/lib/Tim
  			if ($zone =~ m|^(.+?)/(.+)$|) {
  				$regions{$1}++;
  			}
-@@ -42,6 +44,8 @@ sub init {
+@@ -42,6 +45,8 @@
  	}
  	$this->{REGIONS} = [keys %regions];
  	$this->{ZONES} = \@zones;
@@ -31,7 +39,7 @@ diff -p -up Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm.geo Time-ZoneInfo-0.3/lib/Tim
  	return 1;
  }
  
-@@ -68,6 +72,65 @@ sub _zones {
+@@ -68,6 +73,55 @@
  	return wantarray ? @{$this->{ZONES}} : $this->{ZONES};
  }
  
@@ -42,18 +50,8 @@ diff -p -up Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm.geo Time-ZoneInfo-0.3/lib/Tim
 +
 +sub current_zone {
 +	my ($this) = @_;
-+	if (-e '/etc/timezone') {
-+		open(my $F, '<', '/etc/timezone');
-+		my ($zone) = <$F> =~ /(\S+)/ or return;
-+		$zone;
-+	} elsif (-e '/etc/sysconfig/clock') {
-+		open(my $F, '<', '/etc/sysconfig/clock');
-+		my ($zone) = join('', <$F>) =~ /^ZONE=(.*)/m or return;
-+		$zone =~ s/^"(.*)"$/$1/ || $zone =~ s/^'(.*)'$/$1/;
-+		$zone;
-+	} else {
-+		undef;
-+	}
++
++        return DateTime::TimeZone->new( name => 'local' )->name();
 +}
 +
 +sub _raw_latitude_longitude {
@@ -97,7 +95,7 @@ diff -p -up Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm.geo Time-ZoneInfo-0.3/lib/Tim
  1;
  
  __END__
-@@ -85,18 +148,18 @@ Time::ZoneInfo - Perl extension for retu
+@@ -85,18 +139,18 @@
  		print $zone . "\n";
  	}
  
@@ -122,7 +120,7 @@ diff -p -up Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm.geo Time-ZoneInfo-0.3/lib/Tim
  
  =head1 METHODS
  
-@@ -112,6 +175,43 @@ Return an array (or array ref) to the li
+@@ -112,6 +166,43 @@
  
  Return zones (optionally just for one region)
  
@@ -166,7 +164,7 @@ diff -p -up Time-ZoneInfo-0.3/lib/Time/ZoneInfo.pm.geo Time-ZoneInfo-0.3/lib/Tim
  =head1 ERRORS
  
  You can read $Time::ZoneInfo::ERROR for an error message at any time.
-@@ -121,6 +221,8 @@ You can read $Time::ZoneInfo::ERROR for 
+@@ -121,6 +212,8 @@
  Thanks to Richard Carver <cpan.org-rnc@thecarverzone.com> for finding
  issues processing comments.
  
