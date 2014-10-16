@@ -13,6 +13,7 @@ Patch0:		Time-ZoneInfo-0.3-geolocalisation.patch
 BuildArch:	noarch
 BuildRequires:	perl-devel
 BuildRequires:	perl(DateTime::TimeZone)
+BuildRequires:	perl(namespace::clean)
 
 %description
 An OO interface to accessing a list of timezones. This is useful if you
