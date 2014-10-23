@@ -14,6 +14,8 @@ BuildArch:	noarch
 BuildRequires:	perl-devel
 BuildRequires:	perl(DateTime::TimeZone)
 BuildRequires:	perl(namespace::clean)
+BuildRequires:	timezone
+Requires:		timezone
 
 %description
 An OO interface to accessing a list of timezones. This is useful if you
