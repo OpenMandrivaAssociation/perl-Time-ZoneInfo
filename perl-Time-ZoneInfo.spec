@@ -4,7 +4,7 @@
 Summary:	Perl extension for returning a list of Time Zones
 Name:		perl-%{modname}
 Version:	%perl_convert_version %{modver}
-Release:	20
+Release:	21
 License:	GPLv2+ or Artistic
 Group:		Development/Perl
 Url:		http://search.cpan.org/dist/%{modname}
