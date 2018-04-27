@@ -4,7 +4,7 @@
 Summary:	Perl extension for returning a list of Time Zones
 Name:		perl-%{modname}
 Version:	%perl_convert_version %{modver}
-Release:	23
+Release:	24
 License:	GPLv2+ or Artistic
 Group:		Development/Perl
 Url:		http://search.cpan.org/dist/%{modname}
@@ -15,7 +15,7 @@ BuildRequires:	perl-devel
 BuildRequires:	perl(DateTime::TimeZone)
 BuildRequires:	perl(namespace::clean)
 BuildRequires:	timezone
-Requires:		timezone
+Requires:	timezone
 
 %description
 An OO interface to accessing a list of timezones. This is useful if you
