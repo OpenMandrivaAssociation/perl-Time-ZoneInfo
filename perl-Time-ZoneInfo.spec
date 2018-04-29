@@ -14,6 +14,7 @@ BuildArch:	noarch
 BuildRequires:	perl-devel
 BuildRequires:	perl(DateTime::TimeZone)
 BuildRequires:	perl(namespace::clean)
+BuildRequires:	perl(Test::More)
 BuildRequires:	timezone
 Requires:	timezone
 
