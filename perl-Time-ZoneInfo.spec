@@ -17,6 +17,7 @@ BuildRequires:	perl(namespace::clean)
 BuildRequires:	perl(Test)
 BuildRequires:	perl(Test::More)
 BuildRequires:	perl(Package::Stash)
+BuildRequires:	perl(Sub::Identify)
 BuildRequires:	timezone
 Requires:	timezone
 
