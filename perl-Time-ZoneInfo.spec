@@ -30,7 +30,7 @@ Version 0.3.1 also gives the geolocalisation for a time zone.
 
 %prep
 %setup -qn %{modname}-%{modver}
-%apply_patches
+%autopatch -p1
 
 %build
 %__perl Makefile.PL INSTALLDIRS=vendor
