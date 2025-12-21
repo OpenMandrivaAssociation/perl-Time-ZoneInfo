@@ -11,6 +11,7 @@ Url:		https://search.cpan.org/dist/%{modname}
 Source0:	http://www.cpan.org/modules/by-module/Time/%{modname}-%{modver}.tar.gz
 Patch0:		Time-ZoneInfo-0.3-geolocalisation.patch
 BuildArch:	noarch
+BuildRequires:	make
 BuildRequires:	perl-devel
 BuildRequires:	perl(DateTime::TimeZone)
 BuildRequires:	perl(namespace::clean)
