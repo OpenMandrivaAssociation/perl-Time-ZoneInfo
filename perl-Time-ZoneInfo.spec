@@ -3,12 +3,12 @@
 
 Summary:	Perl extension for returning a list of Time Zones
 Name:		perl-%{modname}
-Version:	%perl_convert_version %{modver}
-Release:	26
+Version:	%{modver}
+Release:	27
 License:	GPLv2+ or Artistic
 Group:		Development/Perl
-Url:		https://search.cpan.org/dist/%{modname}
-Source0:	http://www.cpan.org/modules/by-module/Time/%{modname}-%{modver}.tar.gz
+Url:		https://metacpan.org/dist/Time-ZoneInfo
+Source0:	https://cpan.metacpan.org/authors/id/S/SC/SCOTT/Time-ZoneInfo-%{modver}.tar.gz
 Patch0:		Time-ZoneInfo-0.3-geolocalisation.patch
 BuildArch:	noarch
 BuildRequires:	make
